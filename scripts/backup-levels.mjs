@@ -30,7 +30,8 @@ if (existsSync(backupRoot)) {
     .filter(d => statSync(resolve(backupRoot, d)).isDirectory())
     .sort();
   while (dirs.length > 10) {
-    const old = dirs.shift()!;
+    const old = dirs.shift();
+    if (!old) break;
     rmSync(resolve(backupRoot, old), { recursive: true, force: true });
     console.log(`清理旧备份：${old}`);
   }
