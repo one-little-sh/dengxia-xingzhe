@@ -7,12 +7,52 @@ import { Tile, type LevelDef } from './types';
 /** levels/ 目录的 txt 网格（文件名如 L3.txt）；启动时收集，新增 txt 需重启 dev */
 const gridFiles = import.meta.glob('../../levels/*.txt', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
+/** txt 解析结果：可选参数头部（oil: N）+ 网格行。头部以空行与网格分隔 */
+export interface TxtLevelData {
+  oil?: number;      // 编辑器自定义灯油（未写头部则 undefined）
+  grid: string[];
+}
+
+/** 解析 txt 内容：兼容「纯网格」与「头部参数 + 空行 + 网格」两种格式 */
+export function parseLevelTxt(raw: string): TxtLevelData {
+  const lines = raw.replace(/\r\n/g, '\n').split('\n');
+  const data: TxtLevelData = { grid: [] };
+  let gridStarted = false;
+  for (const line of lines) {
+    const t = line.trim();
+    if (t.length === 0) {
+      if (gridStarted) continue; // 网格尾部空行
+      continue;                  // 头部与网格之间的空行
+    }
+    // 头部行：key: value（仅网格开始前识别）
+    if (!gridStarted && /^[a-zA-Z]+:\s*\S+$/.test(t)) {
+      const m = t.match(/^([a-zA-Z]+):\s*(\S+)$/)!;
+      if (m[1] === 'oil') {
+        const n = Number(m[2]);
+        if (Number.isFinite(n) && n > 0) data.oil = Math.floor(n);
+      }
+      continue;
+    }
+    gridStarted = true;
+    data.grid.push(line);
+  }
+  return data;
+}
+
 /** 按文件名（不含扩展名）取外置网格；无则返回 null */
 export function loadGridFile(name: string): string[] | null {
   const raw = gridFiles[`../../levels/${name}.txt`];
   if (!raw) return null;
-  const lines = raw.replace(/\r\n/g, '\n').split('\n').filter(l => l.trim().length > 0);
-  return lines.length > 0 ? lines : null;
+  const { grid } = parseLevelTxt(raw);
+  return grid.length > 0 ? grid : null;
+}
+
+/** 取外置 txt 完整数据（含自定义 oil）；无则返回 null */
+function loadLevelTxt(name: string): TxtLevelData | null {
+  const raw = gridFiles[`../../levels/${name}.txt`];
+  if (!raw) return null;
+  const data = parseLevelTxt(raw);
+  return data.grid.length > 0 ? data : null;
 }
 
 /** 解析关卡网格：gridFile 优先（外置 txt），否则内联 grid */
@@ -22,6 +62,15 @@ export function gridOf(level: LevelDef): string[] {
     if (g) return g;
   }
   return level.grid;
+}
+
+/** 关卡初始灯油：编辑器写入 txt 头部的 oil 优先，否则用 levels.ts 的 level.oil */
+export function levelOil(level: LevelDef): number {
+  if (level.gridFile) {
+    const data = loadLevelTxt(level.gridFile);
+    if (data?.oil !== undefined) return data.oil;
+  }
+  return level.oil;
 }
 
 /** 字符地图转格子矩阵 */
