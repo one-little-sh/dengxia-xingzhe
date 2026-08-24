@@ -10,8 +10,16 @@
 
 - `npm run dev`：开发服务器（--host，局域网可访问，默认 http://localhost:5173）
 - `npm run build`：类型检查（tsc --noEmit）+ 生产构建到 dist/
-- `npm run verify`：关卡合法性校验（BFS 连通性 + 灯油预算）。**改动 src/core/levels.ts 后必须运行**
+- `npm run verify`：关卡合法性校验（BFS 连通性 + 灯油预算）。**改动 levels/*.txt 或 src/core/levels.ts 后必须运行**
+- `npm run backup`：levels 快照备份到 backups/（保留 10 份；建议 verify 全绿后运行）
 - PowerShell 5.1 环境：不支持 `&&`，用 `;` 或 `cmd1; if ($?) { cmd2 }`；优先完整 cmdlet 名
+
+## 备份与版本控制（重要工作流）
+
+- 项目已 git init（本地仓库）。**每个修改任务开始前先 git commit 做检查点**；出问题 `git checkout -- <文件>` 秒级回滚
+- 关卡数据双层结构：`levels/<N>.txt`（纯网格，编辑器维护）+ `src/core/levels.ts`（参数：oil/vision/intro 等）
+- 重大改动前打 tag（如 `git tag before-章节重做`）
+- 历史教训：曾因迁移脚本损坏 50 关且无备份，靠 dist 产物艰难恢复——**改关卡相关文件前必须先提交**
 
 ## 架构与关键约定
 
@@ -21,10 +29,9 @@
   - `src/scenes/`：Phaser 场景，只读 GameState 并播放动画，不反向修改状态
   - `src/render/`：程序化像素纹理（16×16 字符位图生成，暂无美术资源）
   - `src/ui/`：DOM overlay（油量条/toast/结算面板）
-- 关卡：`LevelDef` 字符网格（`#`墙 `.`地板 `F`篝火起点 `E`出口 `T`宝物 `D`捷径门 `X`碎地危险格 `K`钥匙 `L`锁门 `V`断崖单向落差 `G`幽火出生点 `C`诅咒残烛 `R`遗忘图腾 `B`抉择门）；第一阶段十章手工关 L1–L50 + 前三章异关（id 51–53）已全部完成，LEVELS 共 53 关
+- 关卡：`LevelDef` 字符网格（`#`墙 `.`地板 `F`篝火起点 `E`出口 `T`宝物 `D`捷径门 `X`碎地危险格 `K`钥匙 `L`锁门 `V`断崖单向落差 `G`幽火出生点 `C`诅咒残烛 `R`遗忘图腾 `$`灯币 `W`回程门）；第一阶段十章手工关 L1–L50（异关已删除，机制代码保留未启用），LEVELS 共 50 关
+- 关卡数据双层结构：`levels/<N>.txt`（纯网格，编辑器维护，HMR 热更新）+ `src/core/levels.ts`（参数：oil/vision/intro/theme 等）
 - **地图设计原则**：见 `docs/level-design.md`（22 条：硬性规则/数值哲学/摆放/节奏/异关专属 + 审计检查单）。修正关卡前先读该文档
-- 异关机制（章末特殊关，`LevelDef` 标记驱动）：`noMemory`（视野外不留记忆）、`Tile.Gate`（踩入抉择门封死其余）、`hiddenItems`（物件记忆态隐形）、`tint`（氛围色罩）
-- **注意**：异关 id（51+）与数组序号不对应，显示/选关一律用数组索引（`LEVELS.findIndex` / `i+1`），勿用 `lv.id`
 - 关卡设计规则：F→E 最短路必须 ≤ 灯油（verify 强制）；每关一个教学点；教学关带 `tutorial: true` 会在物件被照见时显示旁注标签
 - 关卡数值哲学：**直奔出口的「硬走」路线必须是极限/紧张状态**（剩 0~2 油），规划路线（篝火/门/残烛）才有从容与收集——否则障碍和奖励会被架空。结算面板按收集率给评级（完美引灯/遗留提示）作软负反馈
 - 机制参数：`dangerCost`（碎地额外耗油，当前统一 2）、`treasureOil`（残烛回油，当前统一 3）、`pulseCost`/`pulseRadius`（第五章声呐脉冲，默认 2/4，穿墙揭示记忆态）、`ghostCost`（幽火撞击耗油，默认 4）、`curseOil`/`curseVisionPenalty`（诅咒残烛 +6 油/视野 -1）、`dualLamp`（双灯芯：白芯视野 3/步耗 2，暗芯视野 1/步耗 1，Q 键切换）
