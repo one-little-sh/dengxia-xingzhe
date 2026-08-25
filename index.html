@@ -33,10 +33,11 @@
       padding: 12px;
     }
     #hud {
-      width: min(92vw, 480px);
+      width: min(96vw, 640px);
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 12px;
+      gap: 8px 12px;
       user-select: none;
     }
     #level-name {
@@ -44,6 +45,11 @@
       letter-spacing: 2px;
       white-space: nowrap;
       color: #c8b98f;
+      flex: 0 1 auto;
+      min-width: 0;
+      max-width: 60%;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     #oil-wrap {
       flex: 1;
@@ -84,6 +90,29 @@
     }
     #coin-hud b { color: #f0c96a; font-weight: normal; margin-left: 3px; }
     #coin-hud i { font-style: normal; font-size: 11px; color: #6b7688; margin-left: 2px; }
+    /* 窄屏隐藏行囊副文案，只留 🪙0/2 */
+    @media (max-width: 560px) { #coin-hud i { display: none; } }
+    /* 画布下方导航按钮行（居所/静音/选关） */
+    #hud-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      user-select: none;
+    }
+    #hud-actions button {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: #c8b98f;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 6px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #hud-actions button:hover { background: #2a3444; }
     /* 声呐脉冲按钮 */
     #pulse-btn {
       background: #1a2534;
@@ -114,33 +143,8 @@
     }
     #lamp-btn:hover { background: #3a3020; }
     #lamp-btn.dim { color: #9a8f76; border-color: #4a4330; background: #1a1820; }
-    /* 居所按钮 */
-    #hub-btn {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      color: #c8b98f;
-      font-family: inherit;
-      font-size: 13px;
-      letter-spacing: 2px;
-      padding: 4px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    #hub-btn:hover { background: #2a3444; }
-    /* 静音按钮 */
-    #mute-btn {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      color: #c8b98f;
-      font-family: inherit;
-      font-size: 13px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    #mute-btn:hover { background: #2a3444; }
+    /* 居所/静音/选关按钮样式统一由 #hud-actions 提供 */
+    #mute-btn { padding: 6px 10px; }
     #stage-wrap {
       position: relative;
       border: 1px solid var(--line);
@@ -239,20 +243,6 @@
     #panel button + button { margin-left: 10px; }
     #panel-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
     #panel-actions button { margin-left: 0 !important; }
-    /* HUD 选关按钮 */
-    #level-btn {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      color: #c8b98f;
-      font-family: inherit;
-      font-size: 13px;
-      letter-spacing: 2px;
-      padding: 4px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    #level-btn:hover { background: #2a3444; }
     /* 选关面板（覆盖整个视口，与画布尺寸无关） */
     #level-panel {
       position: fixed;
@@ -460,7 +450,7 @@
       user-select: none;
     }
   </style>
-  <script type="module" crossorigin src="./assets/index-BcvtK1xq.js"></script>
+  <script type="module" crossorigin src="./assets/index-DtsT1PUz.js"></script>
 </head>
 <body>
   <div id="app">
@@ -475,9 +465,6 @@
       <span id="coin-hud" style="display:none">🪙<b id="coin-num">0</b><i id="coin-total"></i></span>
       <button id="pulse-btn" style="display:none">回声（-2 油）</button>
       <button id="lamp-btn" style="display:none">· 暗芯（1 油/步）</button>
-      <button id="hub-btn" title="回到居所（E）">居所</button>
-      <button id="mute-btn" title="音效开关">🔊</button>
-      <button id="level-btn" title="选择关卡">选关</button>
     </div>
     <div id="stage-wrap">
       <div id="toast"></div>
@@ -500,6 +487,11 @@
         </div>
       </div>
       <div id="game-root"></div>
+    </div>
+    <div id="hud-actions">
+      <button id="hub-btn" title="回到居所（E）">居所</button>
+      <button id="mute-btn" title="音效开关">🔊</button>
+      <button id="level-btn" title="选择关卡">选关</button>
     </div>
     <div id="dpad">
       <span class="blank"></span><button data-dir="up">▲</button><span class="blank"></span>
