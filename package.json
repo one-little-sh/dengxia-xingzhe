@@ -9,7 +9,9 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
     "verify": "node scripts/verify-levels.mjs",
-    "backup": "node scripts/backup-levels.mjs"
+    "backup": "node scripts/backup-levels.mjs",
+    "deploy": "node scripts/deploy.mjs",
+    "dev:auto": "node scripts/watch-deploy.mjs"
   },
   "dependencies": {
     "phaser": "^3.90.0"

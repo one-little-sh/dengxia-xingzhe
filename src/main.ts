@@ -53,8 +53,8 @@ function toggleFreeSelect(on: boolean): void {
 let freeSelect = loadFreeSelect();
 
 const hub = new Hub(() => {
-  // 出发：打开选关面板（行者的图卷，含每关收集度）
-  openLevelSelect();
+  // 出发：直接继续最新进度关（未解锁的最新一关）；选关面板仅由 HUD「选关」按钮打开
+  startLevel(Math.min(unlocked - 1, LEVELS.length - 1));
 });
 
 const overlay = new Overlay((action: PanelAction) => {
