@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="灯下行者——提一盏油灯走进黑暗，走多深再回头，是你唯一的赌注。" />
+  <title>灯下行者</title>
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --panel: #161c26;
+      --ink: #e8dcc0;
+      --oil: #f0b34a;
+      --oil-low: #e2543a;
+      --line: #2a3444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Serif SC", "SimSun", "STSong", serif;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #app {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px;
+    }
+    #hud {
+      width: min(92vw, 480px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    #level-name {
+      font-size: 15px;
+      letter-spacing: 2px;
+      white-space: nowrap;
+      color: #c8b98f;
+    }
+    #oil-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #oil-icon { font-size: 16px; line-height: 1; }
+    #oil-bar {
+      flex: 1;
+      height: 12px;
+      background: #0e1119;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    #oil-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #f8d378, var(--oil));
+      transition: width .25s ease, background .25s ease;
+    }
+    #oil-fill.low { background: linear-gradient(90deg, #f08a6a, var(--oil-low)); }
+    #oil-num { font-size: 12px; color: #9a8f76; min-width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
+    #key-hud {
+      font-size: 14px;
+      color: #c8b98f;
+      white-space: nowrap;
+      user-select: none;
+    }
+    #key-hud b { color: #f0c96a; font-weight: normal; margin-left: 3px; }
+    /* 灯币 HUD（本关拾取进度 + 行囊累计） */
+    #coin-hud {
+      font-size: 14px;
+      color: #c8b98f;
+      white-space: nowrap;
+      user-select: none;
+    }
+    #coin-hud b { color: #f0c96a; font-weight: normal; margin-left: 3px; }
+    #coin-hud i { font-style: normal; font-size: 11px; color: #6b7688; margin-left: 2px; }
+    /* 声呐脉冲按钮 */
+    #pulse-btn {
+      background: #1a2534;
+      border: 1px solid #3a5a7a;
+      color: #8fd6ff;
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #pulse-btn:hover:not(:disabled) { background: #24344a; }
+    #pulse-btn:disabled { opacity: .35; cursor: default; }
+    /* 灯芯切换按钮 */
+    #lamp-btn {
+      background: #2a2418;
+      border: 1px solid #6a5a30;
+      color: #f0d890;
+      font-family: inherit;
+      font-size: 12px;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #lamp-btn:hover { background: #3a3020; }
+    #lamp-btn.dim { color: #9a8f76; border-color: #4a4330; background: #1a1820; }
+    /* 居所按钮 */
+    #hub-btn {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: #c8b98f;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #hub-btn:hover { background: #2a3444; }
+    /* 静音按钮 */
+    #mute-btn {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: #c8b98f;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #mute-btn:hover { background: #2a3444; }
+    #stage-wrap {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #05070b;
+      box-shadow: 0 0 40px rgba(240, 179, 74, 0.06), inset 0 0 60px rgba(0,0,0,.6);
+      max-width: 100%;
+    }
+    /* 画布原生尺寸由关卡决定，这里用 CSS 等比缩放适配屏幕 */
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+      max-width: min(92vw, 62vh);
+      height: auto;
+    }
+    /* 触屏方向键：仅粗指针设备显示 */
+    #dpad {
+      display: none;
+      grid-template-columns: repeat(3, 56px);
+      grid-template-rows: repeat(3, 56px);
+      gap: 6px;
+      user-select: none;
+      touch-action: none;
+    }
+    @media (pointer: coarse) { #dpad { display: grid; } }
+    #dpad button {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--ink);
+      font-size: 20px;
+      touch-action: manipulation;
+    }
+    #dpad button:active { background: #2a3444; }
+    #dpad .blank { visibility: hidden; }
+    #dpad .center { display: flex; align-items: center; justify-content: center; font-size: 18px; opacity: .5; }
+    /* 消息 toast */
+    #toast {
+      position: absolute;
+      left: 50%;
+      top: 14px;
+      transform: translateX(-50%) translateY(-8px);
+      background: rgba(10, 13, 20, .92);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      letter-spacing: 1px;
+      color: #e8dcc0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease, transform .3s ease;
+      max-width: 86%;
+      text-align: center;
+      z-index: 10;
+      white-space: pre-line;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    /* 结算面板 */
+    #panel {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(4, 6, 10, .82);
+      z-index: 20;
+    }
+    #panel.show { display: flex; }
+    #panel-card {
+      width: min(84%, 340px);
+      background: var(--panel);
+      border: 1px solid #3a4356;
+      border-radius: 12px;
+      padding: 26px 22px;
+      text-align: center;
+      box-shadow: 0 8px 50px rgba(0,0,0,.7);
+    }
+    #panel-title { font-size: 22px; letter-spacing: 6px; margin-bottom: 10px; }
+    #panel-title.win { color: #f0c96a; }
+    #panel-title.lose { color: #d66; }
+    #panel-sub { font-size: 13px; color: #9a8f76; line-height: 1.9; margin-bottom: 18px; white-space: pre-line; }
+    #panel button {
+      background: #2a3444;
+      border: 1px solid #4a5568;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 15px;
+      letter-spacing: 3px;
+      padding: 10px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #panel button:hover { background: #3a4356; }
+    #panel button + button { margin-left: 10px; }
+    #panel-actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    #panel-actions button { margin-left: 0 !important; }
+    /* HUD 选关按钮 */
+    #level-btn {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      color: #c8b98f;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #level-btn:hover { background: #2a3444; }
+    /* 选关面板（覆盖整个视口，与画布尺寸无关） */
+    #level-panel {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(4, 6, 10, .85);
+      z-index: 50;
+    }
+    #level-panel.show { display: flex; }
+    #level-card {
+      width: min(88%, 420px);
+      max-height: 84vh;
+      overflow-y: auto;
+      background: var(--panel);
+      border: 1px solid #3a4356;
+      border-radius: 12px;
+      padding: 22px 18px;
+      text-align: center;
+      box-shadow: 0 8px 50px rgba(0,0,0,.7);
+    }
+    #level-panel-title {
+      font-size: 17px;
+      letter-spacing: 4px;
+      color: #f0c96a;
+      margin-bottom: 14px;
+    }
+    #level-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .chapter-head {
+      grid-column: 1 / -1;
+      font-size: 12px;
+      color: #9a8f76;
+      letter-spacing: 2px;
+      text-align: left;
+      padding: 8px 2px 4px;
+      border-bottom: 1px solid var(--line);
+    }
+    .level-cell {
+      background: #202839;
+      border: 1px solid #3a4356;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 1px;
+      padding: 9px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+    }
+    .level-cell:hover { background: #2a3444; }
+    .level-cell .level-stats {
+      font-size: 11px;
+      color: #9a8f76;
+      letter-spacing: 0;
+    }
+    .level-cell .level-stats.full { color: #f0c96a; }
+    .level-cell.current { border-color: var(--oil); color: #f0c96a; }
+    .level-cell.unreached { opacity: .55; font-style: italic; }
+    .level-cell.unreached:hover { opacity: .9; }
+    .level-cell:disabled { opacity: .3; cursor: default; font-style: normal; }
+    /* 自由选关开关 */
+    #free-select-btn {
+      grid-column: 1 / -1;
+      background: #1a2534;
+      border: 1px solid #3a5a7a;
+      color: #8fd6ff;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 9px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #free-select-btn:hover { background: #24344a; }
+    #free-select-btn.on { border-color: #6a5a30; color: #f0d890; background: #2a2418; }
+    #level-close {
+      background: #2a3444;
+      border: 1px solid #4a5568;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 14px;
+      letter-spacing: 3px;
+      padding: 9px 28px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #level-close:hover { background: #3a4356; }
+    /* 居所（hub）：游戏大厅页 */
+    #hub {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: radial-gradient(ellipse at 50% 30%, #1a2233 0%, #0b0e14 70%);
+      z-index: 100;
+    }
+    #hub.show { display: flex; }
+    #hub-title { font-size: 24px; letter-spacing: 8px; color: #f0c96a; }
+    #hub-sub { font-size: 13px; color: #9a8f76; letter-spacing: 2px; margin-top: -8px; }
+    #hub-stage { position: relative; width: min(88vw, 560px); }
+    #hub-canvas {
+      width: 100%;
+      image-rendering: pixelated;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #0e1119;
+    }
+    #hub-coins {
+      position: absolute;
+      top: 10px; right: 12px;
+      font-size: 15px;
+      color: #f0c96a;
+      background: rgba(10,13,20,.8);
+      border: 1px solid #4a4330;
+      border-radius: 8px;
+      padding: 4px 12px;
+    }
+    #hub-nodes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      width: min(88vw, 560px);
+      min-height: 44px;
+    }
+    .hub-node {
+      background: #202839;
+      border: 1px solid #3a4356;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 1px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .hub-node:hover:not(:disabled) { background: #2a3444; }
+    .hub-node:disabled { opacity: .4; cursor: default; }
+    .hub-node.done { border-color: #4a6a4a; color: #8fc89f; }
+    .hub-node.new { border-color: var(--oil); color: #f0c96a; box-shadow: 0 0 12px rgba(240,179,74,.4); }
+    #hub-depart {
+      background: #2a2418;
+      border: 1px solid #6a5a30;
+      color: #f0d890;
+      font-family: inherit;
+      font-size: 16px;
+      letter-spacing: 4px;
+      padding: 12px 44px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    #hub-depart:hover { background: #3a3020; }
+    #hub-hint { font-size: 12px; color: #6b7688; letter-spacing: 1px; }
+    /* 当铺抽屉 */
+    #pawn-panel {
+      position: absolute;
+      left: 50%; bottom: 8px;
+      transform: translateX(-50%);
+      width: 92%;
+      max-height: 42%;
+      overflow-y: auto;
+      background: rgba(10,13,20,.94);
+      border: 1px solid #4a4330;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: none;
+    }
+    #pawn-panel.show { display: block; }
+    #pawn-panel .pawn-head {
+      font-size: 13px; color: #f0c96a; letter-spacing: 2px;
+      margin-bottom: 6px; display: flex; justify-content: space-between;
+    }
+    #pawn-panel .pawn-head button {
+      background: none; border: none; color: #9a8f76;
+      font-family: inherit; cursor: pointer; font-size: 12px;
+    }
+    .pawn-item {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--ink);
+      padding: 6px 4px; border-bottom: 1px dashed #2a3444;
+    }
+    .pawn-item .sell-btn {
+      background: #2a2418; border: 1px solid #6a5a30; color: #f0d890;
+      font-family: inherit; font-size: 11px; border-radius: 6px;
+      padding: 3px 10px; cursor: pointer;
+    }
+    .pawn-item .sold-tag { color: #6b7688; font-size: 11px; }
+    #hint {
+      font-size: 12px;
+      color: #6b7688;
+      letter-spacing: 1px;
+      user-select: none;
+    }
+  </style>
+  <script type="module" crossorigin src="./assets/index-BcvtK1xq.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="hud">
+      <span id="level-name">第一章 · 引灯</span>
+      <div id="oil-wrap">
+        <span id="oil-icon">🕯️</span>
+        <div id="oil-bar"><div id="oil-fill"></div></div>
+        <span id="oil-num">20</span>
+      </div>
+      <span id="key-hud" style="display:none">🔑<b id="key-num">0</b></span>
+      <span id="coin-hud" style="display:none">🪙<b id="coin-num">0</b><i id="coin-total"></i></span>
+      <button id="pulse-btn" style="display:none">回声（-2 油）</button>
+      <button id="lamp-btn" style="display:none">· 暗芯（1 油/步）</button>
+      <button id="hub-btn" title="回到居所（E）">居所</button>
+      <button id="mute-btn" title="音效开关">🔊</button>
+      <button id="level-btn" title="选择关卡">选关</button>
+    </div>
+    <div id="stage-wrap">
+      <div id="toast"></div>
+      <div id="panel">
+        <div id="panel-card">
+          <div id="panel-title"></div>
+          <div id="panel-sub"></div>
+          <div id="panel-actions">
+            <button id="panel-btn"></button>
+            <button id="panel-retry-btn">重玩此关</button>
+            <button id="panel-hub-btn">回居所</button>
+          </div>
+        </div>
+      </div>
+      <div id="level-panel">
+        <div id="level-card">
+          <div id="level-panel-title">行者的图卷</div>
+          <div id="level-grid"></div>
+          <button id="level-close">收起图卷</button>
+        </div>
+      </div>
+      <div id="game-root"></div>
+    </div>
+    <div id="dpad">
+      <span class="blank"></span><button data-dir="up">▲</button><span class="blank"></span>
+      <button data-dir="left">◀</button><span class="center">🕯️</span><button data-dir="right">▶</button>
+      <span class="blank"></span><button data-dir="down">▼</button><span class="blank"></span>
+    </div>
+    <div id="hint">方向键 / WASD 移动 · 按住连续走 · 空格声呐 · Q 换灯芯</div>
+  </div>
+  <div id="hub">
+    <div id="hub-title">行者的居所</div>
+    <div id="hub-sub">风尘暂歇，灯火可亲</div>
+    <div id="hub-stage">
+      <canvas id="hub-canvas" width="160" height="100"></canvas>
+      <div id="hub-coins">🪙 0</div>
+      <div id="pawn-panel">
+        <div class="pawn-head"><span>当铺 · 遗物换灯币</span><button id="pawn-close">收起</button></div>
+        <div id="pawn-list"></div>
+      </div>
+    </div>
+    <div id="hub-nodes"></div>
+    <button id="hub-depart">出 发</button>
+    <div id="hub-hint">通关与拾取会积累灯币 · 灯币用来打理行装</div>
+  </div>
+</body>
+</html>
