@@ -116,6 +116,77 @@ function makeWall(scene: Phaser.Scene): void {
   cv.tex.refresh();
 }
 
+/** 章节主题调色板：一套 floor/wall 配色（程序化生成，无美术资源） */
+interface ThemePalette {
+  floorBase: string; floorSpot: string; floorSeam: string;
+  wallBase: string; wallLine: string; wallHi: string;
+}
+
+/** 各章节主题配色（key=theme 名）：地牢/森林沿用原实现，此处为三章起的八套 */
+const THEME_PALETTES: Record<string, ThemePalette> = {
+  bronze: { floorBase: '#2a2520', floorSpot: '#35302a', floorSeam: '#1c1814',
+    wallBase: '#3a3428', wallLine: '#241f16', wallHi: '#57503c' },   // 三章 · 青铜回廊
+  cave:   { floorBase: '#241f1c', floorSpot: '#2e2723', floorSeam: '#171310',
+    wallBase: '#332a24', wallLine: '#1e1712', wallHi: '#4d4136' },   // 四章 · 岩洞
+  ice:    { floorBase: '#1c2833', floorSpot: '#243644', floorSeam: '#101a24',
+    wallBase: '#2a3d4d', wallLine: '#16232e', wallHi: '#4a6a80' },   // 五章 · 冰窟
+  swamp:  { floorBase: '#1c2a22', floorSpot: '#26382c', floorSeam: '#101d16',
+    wallBase: '#26362c', wallLine: '#142019', wallHi: '#3d5a48' },   // 六章 · 沼泽
+  cursed: { floorBase: '#241c2a', floorSpot: '#302538', floorSeam: '#171020',
+    wallBase: '#322840', wallLine: '#1d1528', wallHi: '#513f68' },   // 七章 · 禁忌祭坛
+  mono:   { floorBase: '#26282a', floorSpot: '#313436', floorSeam: '#17181a',
+    wallBase: '#34373a', wallLine: '#1f2123', wallHi: '#52565a' },   // 八章 · 灰白圣所
+  relic:  { floorBase: '#2a2620', floorSpot: '#363026', floorSeam: '#1a1712',
+    wallBase: '#383024', wallLine: '#221c14', wallHi: '#584c38' },   // 九章 · 风化遗迹
+  abyss:  { floorBase: '#2a1c1a', floorSpot: '#382622', floorSeam: '#1a110f',
+    wallBase: '#362420', wallLine: '#20130f', wallHi: '#583428' },   // 十章 · 熔渊
+};
+
+/** 生成一套主题地板+墙（噪点石板 + 砖纹，配色由调色板驱动） */
+function makeThemedTiles(scene: Phaser.Scene, theme: string): void {
+  const p = THEME_PALETTES[theme];
+  if (!p) return;
+  const key = `tx-${theme}`;
+
+  // 地板：底色 + 噪点 + 石缝
+  const fv = mkCanvas(scene, `${key}-floor`, 16);
+  if (!fv) return;
+  const rndF = new Phaser.Math.RandomDataGenerator([`${theme}-floor`]);
+  fv.ctx.fillStyle = p.floorBase;
+  fv.ctx.fillRect(0, 0, 16, 16);
+  for (let i = 0; i < 22; i++) {
+    fv.ctx.fillStyle = rndF.frac() < 0.5 ? p.floorSeam : p.floorSpot;
+    fv.ctx.fillRect(rndF.between(0, 15), rndF.between(0, 15), 1, rndF.frac() < 0.4 ? 2 : 1);
+  }
+  fv.ctx.fillStyle = p.floorSeam;
+  fv.ctx.fillRect(0, 15, 16, 1);
+  fv.ctx.fillRect(8, 0, 1, 7);
+  fv.tex.refresh();
+
+  // 墙：砖块 + 顶棱高光
+  const wv = mkCanvas(scene, `${key}-wall`, 16);
+  if (!wv) return;
+  const rndW = new Phaser.Math.RandomDataGenerator([`${theme}-wall`]);
+  wv.ctx.fillStyle = p.wallBase;
+  wv.ctx.fillRect(0, 0, 16, 16);
+  const brick = (bx: number, by: number, w: number) => {
+    wv.ctx.fillStyle = p.wallLine;
+    wv.ctx.fillRect(bx, by, w, 6);
+    wv.ctx.fillStyle = p.wallHi;
+    wv.ctx.fillRect(bx, by, w, 1);
+  };
+  brick(0, 0, 7); brick(8, 0, 8);
+  brick(0, 8, 3); brick(4, 8, 7); brick(12, 8, 4);
+  wv.ctx.fillStyle = p.wallLine;
+  wv.ctx.fillRect(0, 7, 16, 1);
+  wv.ctx.fillRect(0, 15, 16, 1);
+  for (let i = 0; i < 8; i++) {
+    wv.ctx.fillStyle = rndW.frac() < 0.5 ? p.wallLine : p.wallHi;
+    wv.ctx.fillRect(rndW.between(0, 15), rndW.between(0, 15), 1, 1);
+  }
+  wv.tex.refresh();
+}
+
 /** 森林主题地板：苔藓草地 */
 function makeForestFloor(scene: Phaser.Scene): void {
   const cv = mkCanvas(scene, 'tx-forest-floor', 16);
@@ -583,6 +654,9 @@ export function buildTextures(scene: Phaser.Scene): void {
   makeWall(scene);
   makeForestFloor(scene);
   makeForestWall(scene);
+  for (const theme of Object.keys(THEME_PALETTES)) {
+    makeThemedTiles(scene, theme);
+  }
   makeBitmap(scene, 'tx-warp', BMP_WARP);
   makeBitmap(scene, 'tx-player', BMP_PLAYER);
   makeBitmap(scene, 'tx-bonfire-0', BMP_BONFIRE_0);
@@ -685,6 +759,9 @@ export function tileTexture(tile: Tile): string {
 
 /** 主题 → 地板/墙纹理键（章节美术主题：缺省地牢） */
 export function themeTextures(theme?: string): { floor: string; wall: string } {
+  if (theme && THEME_PALETTES[theme]) {
+    return { floor: `tx-${theme}-floor`, wall: `tx-${theme}-wall` };
+  }
   if (theme === 'forest') {
     return { floor: 'tx-forest-floor', wall: 'tx-forest-wall' };
   }

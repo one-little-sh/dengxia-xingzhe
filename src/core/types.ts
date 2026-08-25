@@ -54,7 +54,7 @@ export interface LevelDef {
   lowOilVision: number; // 低油时的视野半径（格）
   lowOilThreshold: number; // 视野收缩的油量阈值
   tutorial?: boolean;  // 教学关标记：特殊物件被照见时显示旁注标签（仅 L1 使用）
-  theme?: 'forest' | 'dungeon'; // 章节美术主题（二章起 forest；缺省 dungeon）
+  theme?: string;       // 章节美术主题（forest/bronze/cave/ice/swamp/cursed/mono/relic/abyss；缺省地牢）
   noMemory?: boolean;  // 异关·无梦之夜：视野外不留记忆（回头=全黑）
   hiddenItems?: boolean; // 异关·盲物之厅：物件（烛/钥/锁/门）在记忆态隐形，仅视野内可见
   tint?: string;       // 异关氛围色罩（'#rrggbb'，低透明全屏叠加）

@@ -264,6 +264,8 @@ const LEVEL_11: LevelDef = {
   tutorial: true,
   grid: [],
   gridFile: 'L11',
+  theme: 'bronze',
+  tint: '#3a3428',
 };
 
 const LEVEL_12: LevelDef = {
@@ -278,6 +280,8 @@ const LEVEL_12: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L12',
+  theme: 'bronze',
+  tint: '#3a3428',
 };
 
 const LEVEL_13: LevelDef = {
@@ -293,6 +297,8 @@ const LEVEL_13: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L13',
+  theme: 'bronze',
+  tint: '#3a3428',
 };
 
 const LEVEL_14: LevelDef = {
@@ -308,6 +314,8 @@ const LEVEL_14: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L14',
+  theme: 'bronze',
+  tint: '#3a3428',
 };
 
 const LEVEL_15: LevelDef = {
@@ -323,6 +331,8 @@ const LEVEL_15: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L15',
+  theme: 'bronze',
+  tint: '#3a3428',
 };
 
 const LEVEL_16: LevelDef = {
@@ -338,6 +348,8 @@ const LEVEL_16: LevelDef = {
   tutorial: true,
   grid: [],
   gridFile: 'L16',
+  theme: 'cave',
+  tint: '#2a221c',
 };
 
 const LEVEL_17: LevelDef = {
@@ -352,6 +364,8 @@ const LEVEL_17: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L17',
+  theme: 'cave',
+  tint: '#2a221c',
 };
 
 const LEVEL_18: LevelDef = {
@@ -367,6 +381,8 @@ const LEVEL_18: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L18',
+  theme: 'cave',
+  tint: '#2a221c',
 };
 
 const LEVEL_19: LevelDef = {
@@ -382,6 +398,8 @@ const LEVEL_19: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L19',
+  theme: 'cave',
+  tint: '#2a221c',
 };
 
 const LEVEL_20: LevelDef = {
@@ -397,6 +415,8 @@ const LEVEL_20: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L20',
+  theme: 'cave',
+  tint: '#2a221c',
 };
 
 const LEVEL_21: LevelDef = {
@@ -414,6 +434,8 @@ const LEVEL_21: LevelDef = {
   tutorial: true,
   grid: [],
   gridFile: 'L21',
+  theme: 'ice',
+  tint: '#2a4a6a',
 };
 
 const LEVEL_22: LevelDef = {
@@ -429,6 +451,8 @@ const LEVEL_22: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L22',
+  theme: 'ice',
+  tint: '#2a4a6a',
 };
 
 const LEVEL_23: LevelDef = {
@@ -445,6 +469,8 @@ const LEVEL_23: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L23',
+  theme: 'ice',
+  tint: '#2a4a6a',
 };
 
 const LEVEL_24: LevelDef = {
@@ -461,6 +487,8 @@ const LEVEL_24: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L24',
+  theme: 'ice',
+  tint: '#2a4a6a',
 };
 
 const LEVEL_25: LevelDef = {
@@ -477,6 +505,8 @@ const LEVEL_25: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L25',
+  theme: 'ice',
+  tint: '#2a4a6a',
 };
 
 const LEVEL_26: LevelDef = {
@@ -493,6 +523,8 @@ const LEVEL_26: LevelDef = {
   tutorial: true,
   grid: [],
   gridFile: 'L26',
+  theme: 'swamp',
+  tint: '#2a4a3a',
 };
 
 const LEVEL_27: LevelDef = {
@@ -508,6 +540,8 @@ const LEVEL_27: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L27',
+  theme: 'swamp',
+  tint: '#2a4a3a',
 };
 
 const LEVEL_28: LevelDef = {
@@ -523,6 +557,8 @@ const LEVEL_28: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L28',
+  theme: 'swamp',
+  tint: '#2a4a3a',
 };
 
 const LEVEL_29: LevelDef = {
@@ -540,6 +576,8 @@ const LEVEL_29: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L29',
+  theme: 'swamp',
+  tint: '#2a4a3a',
 };
 
 const LEVEL_30: LevelDef = {
@@ -557,6 +595,8 @@ const LEVEL_30: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L30',
+  theme: 'swamp',
+  tint: '#2a4a3a',
 };
 
 const LEVEL_31: LevelDef = {
@@ -574,6 +614,8 @@ const LEVEL_31: LevelDef = {
   tutorial: true,
   grid: [],
   gridFile: 'L31',
+  theme: 'cursed',
+  tint: '#3a2a5a',
 };
 
 const LEVEL_32: LevelDef = {
@@ -590,6 +632,8 @@ const LEVEL_32: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L32',
+  theme: 'cursed',
+  tint: '#3a2a5a',
 };
 
 const LEVEL_33: LevelDef = {
@@ -606,6 +650,8 @@ const LEVEL_33: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L33',
+  theme: 'cursed',
+  tint: '#3a2a5a',
 };
 
 const LEVEL_34: LevelDef = {
@@ -624,6 +670,8 @@ const LEVEL_34: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L34',
+  theme: 'cursed',
+  tint: '#3a2a5a',
 };
 
 const LEVEL_35: LevelDef = {
@@ -643,6 +691,8 @@ const LEVEL_35: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L35',
+  theme: 'cursed',
+  tint: '#3a2a5a',
 };
 
 const LEVEL_36: LevelDef = {
@@ -659,6 +709,8 @@ const LEVEL_36: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L36',
+  theme: 'mono',
+  tint: '#3a3d42',
 };
 
 const LEVEL_37: LevelDef = {
@@ -673,6 +725,8 @@ const LEVEL_37: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L37',
+  theme: 'mono',
+  tint: '#3a3d42',
 };
 
 const LEVEL_38: LevelDef = {
@@ -690,6 +744,8 @@ const LEVEL_38: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L38',
+  theme: 'mono',
+  tint: '#3a3d42',
 };
 
 const LEVEL_39: LevelDef = {
@@ -706,6 +762,8 @@ const LEVEL_39: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L39',
+  theme: 'mono',
+  tint: '#3a3d42',
 };
 
 const LEVEL_40: LevelDef = {
@@ -723,6 +781,8 @@ const LEVEL_40: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L40',
+  theme: 'mono',
+  tint: '#3a3d42',
 };
 
 const LEVEL_41: LevelDef = {
@@ -738,6 +798,8 @@ const LEVEL_41: LevelDef = {
   tutorial: true,
   grid: [],
   gridFile: 'L41',
+  theme: 'relic',
+  tint: '#4a4030',
 };
 
 const LEVEL_42: LevelDef = {
@@ -752,6 +814,8 @@ const LEVEL_42: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L42',
+  theme: 'relic',
+  tint: '#4a4030',
 };
 
 const LEVEL_43: LevelDef = {
@@ -766,6 +830,8 @@ const LEVEL_43: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L43',
+  theme: 'relic',
+  tint: '#4a4030',
 };
 
 const LEVEL_44: LevelDef = {
@@ -783,6 +849,8 @@ const LEVEL_44: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L44',
+  theme: 'relic',
+  tint: '#4a4030',
 };
 
 const LEVEL_45: LevelDef = {
@@ -798,6 +866,8 @@ const LEVEL_45: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L45',
+  theme: 'relic',
+  tint: '#4a4030',
 };
 
 const LEVEL_46: LevelDef = {
@@ -813,6 +883,8 @@ const LEVEL_46: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L46',
+  theme: 'abyss',
+  tint: '#4a2620',
 };
 
 const LEVEL_47: LevelDef = {
@@ -832,6 +904,8 @@ const LEVEL_47: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L47',
+  theme: 'abyss',
+  tint: '#4a2620',
 };
 
 const LEVEL_48: LevelDef = {
@@ -848,6 +922,8 @@ const LEVEL_48: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L48',
+  theme: 'abyss',
+  tint: '#4a2620',
 };
 
 const LEVEL_49: LevelDef = {
@@ -864,6 +940,8 @@ const LEVEL_49: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L49',
+  theme: 'abyss',
+  tint: '#4a2620',
 };
 
 const LEVEL_50: LevelDef = {
@@ -884,6 +962,8 @@ const LEVEL_50: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L50',
+  theme: 'abyss',
+  tint: '#4a2620',
 };
 
 /** 当前已实现的关卡序列（每章一个美术主题；异关机制保留代码未启用） */
