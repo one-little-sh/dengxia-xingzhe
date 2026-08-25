@@ -29,10 +29,25 @@ for (const [, id, body] of blocks) {
     continue;
   }
   // 网格来源：外置 txt 优先（levels/ 在项目根，即 scripts/ 的上一级）
+  // txt 格式：可选头部（oil: N）+ 空行 + 网格——头部 oil 优先于 levels.ts
   let rows;
+  let txtOil = null;
   if (gfMatch) {
     const txt = readFileSync(new URL(`../levels/${gfMatch[1]}.txt`, import.meta.url), 'utf8');
-    rows = txt.replace(/\r\n/g, '\n').split('\n').filter(l => l.trim().length > 0);
+    const lines = txt.replace(/\r\n/g, '\n').split('\n');
+    const gridLines = [];
+    for (const line of lines) {
+      const t = line.trim();
+      if (t.length === 0) continue;
+      // 头部参数行：key: value（网格开始前识别）
+      if (gridLines.length === 0 && /^[a-zA-Z]+:\s*\S+$/.test(t)) {
+        const m = t.match(/^([a-zA-Z]+):\s*(\S+)$/);
+        if (m && m[1] === 'oil') txtOil = Number(m[2]);
+        continue;
+      }
+      gridLines.push(line);
+    }
+    rows = gridLines;
   } else {
     const gridMatch = body.match(/grid:\s*\[([^\]]+)\]/);
     if (!gridMatch) {
@@ -42,7 +57,7 @@ for (const [, id, body] of blocks) {
     }
     rows = [...gridMatch[1].matchAll(/'([^']*)'/g)].map(m => m[1]);
   }
-  const oil = Number(oilMatch[1]);
+  const oil = txtOil !== null && Number.isFinite(txtOil) ? txtOil : Number(oilMatch[1]);
   const dangerCost = dcMatch ? Number(dcMatch[1]) : 2;
   const treasureOil = toMatch ? Number(toMatch[1]) : 0;
   const curseOil = coMatch ? Number(coMatch[1]) : 0;
@@ -182,7 +197,8 @@ for (const [, id, body] of blocks) {
   if (specials.K.length || specials.L.length) info.push(`钥 ${specials.K.length}/锁 ${specials.L.length}`);
 
   const tag = problems.length ? '✗' : '✓';
-  console.log(`${tag} L${id}  灯油 ${oil}  ${info.join(' · ')}`);
+  const oilLabel = txtOil !== null ? `灯油 ${oil}*` : `灯油 ${oil}`; // * = txt 头部自定义
+  console.log(`${tag} L${id}  ${oilLabel}  ${info.join(' · ')}`);
   for (const wn of warnings) console.log(`    ! ${wn}`);
   if (problems.length) {
     failed = true;

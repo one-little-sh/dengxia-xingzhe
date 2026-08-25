@@ -2,7 +2,7 @@
 // 架构约束：渲染层只读 snapshot 与事件，不反向修改状态；
 // 后续地图生成器与 AI 叙事层也只作用于这一层。
 import { Tile, Dir, type LevelDef, type MoveResult, type MoveEvent, type PulseResult, type GhostState, type LampMode, type GameSnapshot, type Phase } from './types';
-import { parseGrid, gridOf } from './levels';
+import { parseGrid, gridOf, levelOil } from './levels';
 
 const DIR_DELTA: Record<Dir, { col: number; row: number }> = {
   [Dir.Up]: { col: 0, row: -1 },
@@ -22,6 +22,7 @@ export class GameState {
   private playerCol: number;
   private playerRow: number;
   private oil: number;
+  private maxOil: number;   // 本关油量上限（编辑器 txt 头部 oil 优先）
   private steps = 0;
   private treasureCount = 0;
   private totalTreasures: number;
@@ -76,7 +77,8 @@ export class GameState {
     }
     this.playerCol = startCol;
     this.playerRow = startRow;
-    this.oil = level.oil;
+    this.maxOil = levelOil(level);
+    this.oil = this.maxOil;
     this.totalTreasures = treasures;
     this.totalKeys = keys;
     this.totalCurses = curses;
@@ -186,7 +188,7 @@ export class GameState {
       this.treasureCount++;
       const gain = this.level.treasureOil ?? 0;
       if (gain > 0) {
-        this.oil = Math.min(this.level.oil, this.oil + gain);
+        this.oil = Math.min(this.maxOil, this.oil + gain);
         // 回油越过低油阈值后允许下次再警告
         if (this.oil > this.level.lowOilThreshold) this.lowOilWarned = false;
         result.events.push({
@@ -230,7 +232,7 @@ export class GameState {
       this.takenTreasures.add(key(nc, nr)); // 诅咒烛计入收集统计
       this.curseCount++;
       const gain = this.level.curseOil ?? 6;
-      this.oil = Math.min(this.level.oil, this.oil + gain);
+      this.oil = Math.min(this.maxOil, this.oil + gain);
       if (this.oil > this.level.lowOilThreshold) this.lowOilWarned = false;
       const radius = this.visionRadius;
       result.events.push({
@@ -313,9 +315,9 @@ export class GameState {
 
     // 踩上篝火：回满灯油
     if (this.tiles[this.playerRow][this.playerCol] === Tile.Bonfire) {
-      if (this.oil < this.level.oil) {
-        this.oil = this.level.oil;
-        result.oilChanged = this.level.oil;
+      if (this.oil < this.maxOil) {
+        this.oil = this.maxOil;
+        result.oilChanged = this.maxOil;
         result.events.push({ type: 'refill', text: '灯芯在火光里重新饱满了。' });
         this.lowOilWarned = false;
         this.refreshVision();
@@ -589,7 +591,7 @@ export class GameState {
       playerCol: this.playerCol,
       playerRow: this.playerRow,
       oil: this.oil,
-      maxOil: this.level.oil,
+      maxOil: this.maxOil,
       steps: this.steps,
       treasures: this.treasureCount,
       totalTreasures: this.totalTreasures,

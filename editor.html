@@ -40,6 +40,19 @@
     .hint { font-size: 11px; color: #6b7688; line-height: 1.7; }
     .row-ops { display: flex; gap: 5px; }
     .row-ops button { flex: 1; font-size: 12px; padding: 4px; }
+    /* 灯油输入行 */
+    .oil-row {
+      display: flex; align-items: center; gap: 8px;
+      background: #202839; border: 1px solid #3a4356; border-radius: 6px;
+      padding: 6px 8px; font-size: 13px;
+    }
+    .oil-row label { color: #9a8f76; flex: 1; }
+    .oil-row input {
+      width: 56px; background: #141a26; border: 1px solid #3a4356;
+      color: var(--gold); font-family: inherit; font-size: 14px;
+      text-align: center; border-radius: 4px; padding: 3px 4px;
+    }
+    .oil-row input:focus { outline: 1px solid var(--gold); }
     #lv-meta { font-size: 12px; color: #9a8f76; line-height: 1.8; border-top: 1px dashed var(--line); padding-top: 8px; }
     /* 主区 */
     #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -74,6 +87,10 @@
     <h1>关卡编辑器</h1>
     <select id="level-select"></select>
     <div id="lv-meta">选择关卡…</div>
+    <div class="oil-row">
+      <label for="oil-input">初始灯油</label>
+      <input type="number" id="oil-input" min="1" max="99" value="10" />
+    </div>
     <div class="palette" id="palette"></div>
     <div class="hint">左键：放置选中字符<br>右键：擦除（改回地板）<br>拖动可连续绘制</div>
     <div class="row-ops">

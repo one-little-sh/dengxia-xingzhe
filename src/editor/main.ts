@@ -1,6 +1,18 @@
 // 关卡可视化编辑器：读写 levels/*.txt（游戏数据同源）。
 // 校验算法与 scripts/verify-levels.mjs 保持一致（Node 脚本无法直接 import，双份维护）。
-import { LEVELS, gridOf } from '../core/levels';
+// txt 格式：可选头部（oil: N）+ 空行 + 网格；保存时把灯油输入框值写入头部。
+import { LEVELS, gridOf, parseLevelTxt } from '../core/levels';
+
+/** 从 levels.ts 的 glob 缓存读不到原始 txt（编辑器独立页面）——用 fetch 拉 dev server 文件 */
+async function fetchTxt(name: string): Promise<string | null> {
+  try {
+    const r = await fetch(`/levels/${name}.txt`);
+    if (!r.ok) return null;
+    return await r.text();
+  } catch {
+    return null;
+  }
+}
 
 /** FS Access API 的扩展类型（lib.dom 未内置 queryPermission 等） */
 interface DirHandleExt extends FileSystemDirectoryHandle {
@@ -42,6 +54,10 @@ let rows: string[] = [];
 let brush = '#';
 let dirty = false;
 let dirHandle: DirHandleExt | null = null;
+/** 当前编辑关卡的灯油（输入框实时值） */
+let currentOil = 10;
+/** 切换关卡时锁输入框（避免程序赋值触发 input 事件） */
+let oilInputLock = false;
 
 // ---------- 初始化 ----------
 function init(): void {
@@ -66,6 +82,19 @@ function init(): void {
   $('#btn-save').addEventListener('click', saveFile);
   $('#btn-newfile').addEventListener('click', showMigrateText);
 
+  // 灯油输入：实时更新 currentOil 并标记未保存
+  const oilInput = $('#oil-input') as HTMLInputElement;
+  oilInput.addEventListener('input', () => {
+    if (oilInputLock) return;
+    const v = Number(oilInput.value);
+    if (Number.isFinite(v) && v >= 1 && v <= 99) {
+      currentOil = Math.floor(v);
+      dirty = true;
+      updateDirty();
+      liveCheck();
+    }
+  });
+
   restoreDirHandle();
   loadLevel(currentIndex);
 }
@@ -86,13 +115,28 @@ function buildPalette(): void {
   }
 }
 
-function loadLevel(index: number): void {
+async function loadLevel(index: number): Promise<void> {
   currentIndex = index;
   const lv = LEVELS[index];
-  rows = gridOf(lv).map(r => r);
+  // 网格与灯油都从 txt 原文读（含头部）；fetch 失败退回 levels.ts glob
+  const raw = lv.gridFile ? await fetchTxt(lv.gridFile) : null;
+  if (raw !== null) {
+    const data = parseLevelTxt(raw);
+    rows = data.grid.map(r => r);
+    currentOil = data.oil ?? lv.oil;
+  } else {
+    rows = gridOf(lv).map(r => r);
+    currentOil = lv.oil;
+  }
   dirty = false;
+  oilInputLock = true;
+  const oilInput = $('#oil-input') as HTMLInputElement;
+  oilInput.value = String(currentOil);
+  oilInputLock = false;
   const meta = $('#lv-meta');
-  meta.innerHTML = `灯油 <b style="color:var(--gold)">${lv.oil}</b> · 视野 ${lv.visionRadius}/${lv.lowOilVision}<br>` +
+  const isCustom = raw !== null && parseLevelTxt(raw).oil !== undefined;
+  const shownOil = isCustom ? `${currentOil}（自定义）` : `${currentOil}`;
+  meta.innerHTML = `灯油 <b style="color:var(--gold)">${shownOil}</b> · 视野 ${lv.visionRadius}/${lv.lowOilVision}<br>` +
     `${lv.gridFile ? `网格文件：levels/${lv.gridFile}.txt` : '内联网格（未迁移，保存不生效）'}`;
   $('#cur-level').textContent = `${index + 1} · ${lv.levelName}`;
   render();
@@ -227,12 +271,14 @@ function check(): CheckIssue[] {
   const dE = E ? cost.get(`${E[0]},${E[1]}`) : undefined;
   if (dE === undefined) issues.push({ level: 'bad', text: '出口不可达' });
   else {
+    // 灯油用编辑器当前值（含自定义）
+    const oil = currentOil;
     const candle = (sp['T'] ?? []).length * (lv.treasureOil ?? 0) + (sp['C'] ?? []).length * (lv.curseOil ?? 0);
-    if (dE > lv.oil + candle) issues.push({ level: 'bad', text: `F→E 裸耗 ${dE} > 灯油 ${lv.oil} + 烛回油 ${candle}，无法通关` });
+    if (dE > oil + candle) issues.push({ level: 'bad', text: `F→E 裸耗 ${dE} > 灯油 ${oil} + 烛回油 ${candle}，无法通关` });
     else {
-      const spare = lv.oil - dE;
+      const spare = oil - dE;
       issues.push({ level: 'ok', text: `硬走余量 ${spare} 油（${spare <= 2 ? '符合极限哲学' : '偏宽松，建议收紧油量'}）` });
-      if (dE > lv.oil) issues.push({ level: 'warn', text: `裸耗 ${dE} > 灯油 ${lv.oil}，通关依赖烛补给` });
+      if (dE > oil) issues.push({ level: 'warn', text: `裸耗 ${dE} > 灯油 ${oil}，通关依赖烛补给` });
     }
   }
   return issues;
@@ -251,7 +297,8 @@ function runCheck(): void {
 
 // ---------- 保存（FS Access API） ----------
 function gridText(): string {
-  return rows.join('\n') + '\n';
+  // 头部写当前灯油（自定义值），空行分隔网格
+  return `oil: ${currentOil}\n\n` + rows.join('\n') + '\n';
 }
 
 async function saveFile(): Promise<void> {
