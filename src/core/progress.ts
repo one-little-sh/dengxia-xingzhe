@@ -22,3 +22,22 @@ export function saveUnlocked(count: number): void {
     // 忽略：写入失败不影响游玩（本局进度仍在内存中）
   }
 }
+
+const FREE_KEY = 'dengxia-free-select';
+
+/** 自由选关开关（默认关：需按顺序一关关推进） */
+export function loadFreeSelect(): boolean {
+  try {
+    return localStorage.getItem(FREE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function saveFreeSelect(on: boolean): void {
+  try {
+    localStorage.setItem(FREE_KEY, on ? '1' : '0');
+  } catch {
+    // 忽略
+  }
+}

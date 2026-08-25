@@ -322,6 +322,22 @@
     .level-cell.current { border-color: var(--oil); color: #f0c96a; }
     .level-cell.unreached { opacity: .55; font-style: italic; }
     .level-cell.unreached:hover { opacity: .9; }
+    .level-cell:disabled { opacity: .3; cursor: default; font-style: normal; }
+    /* 自由选关开关 */
+    #free-select-btn {
+      grid-column: 1 / -1;
+      background: #1a2534;
+      border: 1px solid #3a5a7a;
+      color: #8fd6ff;
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 9px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #free-select-btn:hover { background: #24344a; }
+    #free-select-btn.on { border-color: #6a5a30; color: #f0d890; background: #2a2418; }
     #level-close {
       background: #2a3444;
       border: 1px solid #4a5568;

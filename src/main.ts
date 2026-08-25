@@ -5,7 +5,7 @@ import { ExploreScene } from './scenes/ExploreScene';
 import { Overlay, type PanelAction } from './ui/overlay';
 import { Hub } from './ui/hub';
 import { LEVELS, gridOf } from './core/levels';
-import { loadUnlocked, saveUnlocked } from './core/progress';
+import { loadUnlocked, saveUnlocked, loadFreeSelect, saveFreeSelect } from './core/progress';
 import { loadMeta, commitLevel, abortLevel, gainCoins, gainRelic, relicPrice, alreadyClaimed, type MetaState } from './core/meta';
 import { sfx, unlock as sfxUnlock, restoreMutePref, toggleMute, onMuteChanged, isMuted } from './audio/sfx';
 import { Dir, type GameSnapshot } from './core/types';
@@ -33,9 +33,28 @@ function startLevel(index: number): void {
   if (scene) scene.scene.restart();
 }
 
-const hub = new Hub((index: number) => {
+/** 打开选关面板（自由选关开关状态 + 切换回调统一在此） */
+function openLevelSelect(): void {
+  overlay.showLevelSelect(
+    LEVELS, unlocked, levelIndex,
+    i => startLevel(i),
+    id => meta.levelStats[id],
+    freeSelect,
+  );
+}
+
+/** 自由选关开关切换：持久化并重绘面板 */
+function toggleFreeSelect(on: boolean): void {
+  freeSelect = on;
+  saveFreeSelect(on);
+  openLevelSelect();
+}
+
+let freeSelect = loadFreeSelect();
+
+const hub = new Hub(() => {
   // 出发：打开选关面板（行者的图卷，含每关收集度）
-  overlay.showLevelSelect(LEVELS, unlocked, index, i => startLevel(i), id => meta.levelStats[id]);
+  openLevelSelect();
 });
 
 const overlay = new Overlay((action: PanelAction) => {
@@ -161,8 +180,11 @@ document.getElementById('hub-btn')?.addEventListener('click', exitToHub);
 // 选关按钮
 document.getElementById('level-btn')?.addEventListener('click', () => {
   sfxUnlock(); // 用户手势：解锁 AudioContext
-  overlay.showLevelSelect(LEVELS, unlocked, levelIndex, i => startLevel(i), id => meta.levelStats[id]);
+  openLevelSelect();
 });
+
+// 自由选关开关回调（overlay 面板按钮 → 切换并重绘）
+overlay.onFreeSelectToggle = on => toggleFreeSelect(on);
 
 // 触屏方向键：按住持续移动，松开即停
 document.querySelectorAll<HTMLButtonElement>('#dpad button[data-dir]').forEach(btn => {

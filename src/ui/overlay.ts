@@ -12,6 +12,8 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string) =>
 export class Overlay {
   private toastTimer: number | null = null;
   private action: PanelAction = 'retry';
+  /** 自由选关开关回调（main 注入：切换并重绘面板） */
+  onFreeSelectToggle: ((on: boolean) => void) | null = null;
 
   constructor(onAction: (action: PanelAction) => void) {
     $('#panel-btn').addEventListener('click', () => {
@@ -200,7 +202,8 @@ export class Overlay {
   }
 
   /** 选关面板：按章节分组；序号用数组位置（异关 id 非连续）；
-   *  currentIndex 为当前关卡在数组中的索引；未解锁关仍可选（自由探索）；
+   *  currentIndex 为当前关卡在数组中的索引；
+   *  自由选关开启时全部可选；未开启时仅解锁关可选（其余置灰禁用）；
    *  getStats 返回每关收集统计（图卷上显示 🪙/🕯 收集度，全收集金色） */
   showLevelSelect(
     levels: LevelDef[],
@@ -208,9 +211,21 @@ export class Overlay {
     currentIndex: number,
     onSelect: (index: number) => void,
     getStats?: (levelId: number) => LevelStats | undefined,
+    freeSelect = false,
   ): void {
     const grid = $('#level-grid');
     grid.innerHTML = '';
+
+    // 自由选关开关按钮（面板顶部）
+    const freeBtn = document.createElement('button');
+    freeBtn.id = 'free-select-btn';
+    freeBtn.className = freeSelect ? 'on' : '';
+    freeBtn.textContent = freeSelect ? '🔓 自由选关：开' : '🔒 开启自由选关';
+    freeBtn.addEventListener('click', () => {
+      const cb = this.onFreeSelectToggle;
+      if (cb) cb(!freeSelect);
+    });
+    grid.appendChild(freeBtn);
     let lastChapter = '';
     levels.forEach((lv, i) => {
       if (lv.chapterName !== lastChapter) {
@@ -221,10 +236,12 @@ export class Overlay {
         grid.appendChild(head);
       }
       const notReached = i >= unlocked;
+      const selectable = freeSelect || !notReached;
       const cell = document.createElement('button');
       cell.className = 'level-cell'
         + (notReached ? ' unreached' : '')
         + (i === currentIndex ? ' current' : '');
+      cell.disabled = !selectable;
       const name = document.createElement('span');
       name.className = 'level-name';
       name.textContent = notReached
