@@ -182,28 +182,27 @@
     #dpad button:active { background: #2a3444; }
     #dpad .blank { visibility: hidden; }
     #dpad .center { display: flex; align-items: center; justify-content: center; font-size: 18px; opacity: .5; }
-    /* 消息 toast */
+    /* 消息提示条：画布下方固定占位，不遮挡地图 */
     #toast {
-      position: absolute;
-      left: 50%;
-      top: 14px;
-      transform: translateX(-50%) translateY(-8px);
+      min-height: 38px;
+      width: min(96vw, 640px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: rgba(10, 13, 20, .92);
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 8px 16px;
+      padding: 6px 16px;
       font-size: 14px;
       letter-spacing: 1px;
       color: #e8dcc0;
       opacity: 0;
       pointer-events: none;
-      transition: opacity .3s ease, transform .3s ease;
-      max-width: 86%;
+      transition: opacity .3s ease;
       text-align: center;
-      z-index: 10;
       white-space: pre-line;
     }
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.show { opacity: 1; }
     /* 结算面板 */
     #panel {
       position: absolute;
@@ -466,7 +465,6 @@
       <button id="lamp-btn" style="display:none">· 暗芯（1 油/步）</button>
     </div>
     <div id="stage-wrap">
-      <div id="toast"></div>
       <div id="panel">
         <div id="panel-card">
           <div id="panel-title"></div>
@@ -487,6 +485,7 @@
       </div>
       <div id="game-root"></div>
     </div>
+    <div id="toast"></div>
     <div id="hud-actions">
       <button id="hub-btn" title="回到居所（E）">居所</button>
       <button id="mute-btn" title="音效开关">🔊</button>

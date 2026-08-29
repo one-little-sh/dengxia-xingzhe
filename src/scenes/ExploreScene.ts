@@ -41,7 +41,6 @@ export class ExploreScene extends Phaser.Scene {
   private tutorialLabels: {
     col: number; row: number;
     text: Phaser.GameObjects.Text;
-    revealed: boolean;
   }[] = [];
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<'up' | 'down' | 'left' | 'right', Phaser.Input.Keyboard.Key>;
@@ -482,21 +481,27 @@ export class ExploreScene extends Phaser.Scene {
           .setOrigin(0.5, below ? 0 : 1)
           .setAlpha(0)
           .setDepth(60);
-        this.tutorialLabels.push({ col: c, row: r, text, revealed: false });
+        this.tutorialLabels.push({ col: c, row: r, text });
       }
     }
   }
 
-  /** 已被照见的标签淡入（每帧迷雾刷新时检查） */
+  /** 教学标签：玩家恰好站在物件格上时显示，离开即隐藏（拾取类沿用 fadeout 永久隐藏） */
   private revealTutorialLabels(): void {
+    const snap = this.state.getSnapshot();
     for (const item of this.tutorialLabels) {
-      if (!item.revealed && this.state.inVision(item.col, item.row)) {
-        item.revealed = true;
+      const onIt = item.col === snap.playerCol && item.row === snap.playerRow;
+      if (onIt && item.text.alpha < 1) {
+        // 站上：淡入（已在淡出途中的直接拉回）
+        this.tweens.killTweensOf(item.text);
+        item.text.setAlpha(1);
+      } else if (!onIt && item.text.alpha > 0) {
+        // 离开：淡出
+        this.tweens.killTweensOf(item.text);
         this.tweens.add({
           targets: item.text,
-          alpha: { from: 0, to: 1 },
-          duration: 600,
-          ease: 'Sine.easeOut',
+          alpha: 0,
+          duration: 300,
         });
       }
     }
