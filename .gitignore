@@ -5,3 +5,4 @@ dev-server.err.log
 *.local
 backups/
 .deploy-tmp/
+release/
