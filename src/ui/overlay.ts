@@ -33,10 +33,6 @@ export class Overlay {
       const cb = this.onPulse;
       if (cb) cb();
     });
-    $('#lamp-btn').addEventListener('click', () => {
-      const cb = this.onLamp;
-      if (cb) cb();
-    });
   }
 
   /** 声呐脉冲回调（由 main.ts 注入场景调用） */
@@ -53,40 +49,12 @@ export class Overlay {
     $('#pulse-btn').style.display = enabled ? '' : 'none';
   }
 
-  /** 刷新脉冲按钮可用态（油不足置灰）与文案 */
+  /** 刷新脉冲按钮可用态（油不足置灰）与文案（方向键旁小按钮，文案精简） */
   updatePulseButton(snap: GameSnapshot, cost: number): void {
     if (!this.pulseEnabled) return;
     const btn = $('#pulse-btn') as HTMLButtonElement;
     btn.disabled = snap.oil < cost;
-    btn.textContent = `回声（-${cost} 油）`;
-  }
-
-  // ---------- 双灯芯（第八章） ----------
-
-  private onLamp: (() => void) | null = null;
-  private lampEnabled = false;
-
-  setLampHandler(handler: (() => void) | null): void {
-    this.onLamp = handler;
-  }
-
-  /** 灯芯按钮显隐：双灯芯关卡才显示 */
-  setLampEnabled(enabled: boolean): void {
-    this.lampEnabled = enabled;
-    $('#lamp-btn').style.display = enabled ? '' : 'none';
-  }
-
-  /** 刷新灯芯按钮文案（当前模式 + 步耗） */
-  updateLamp(snap: GameSnapshot): void {
-    if (!this.lampEnabled) return;
-    const btn = $('#lamp-btn') as HTMLButtonElement;
-    if (snap.lampMode === 'bright') {
-      btn.textContent = '🕯️ 白芯（2 油/步）';
-      btn.classList.remove('dim');
-    } else {
-      btn.textContent = '· 暗芯（1 油/步）';
-      btn.classList.add('dim');
-    }
+    btn.textContent = `回声\n-${cost}油`;
   }
 
   setLevelName(name: string): void {

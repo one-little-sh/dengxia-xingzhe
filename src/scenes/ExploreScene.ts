@@ -102,11 +102,8 @@ export class ExploreScene extends Phaser.Scene {
     } else {
       this.overlay.setPulseHandler(null);
     }
-    // 双灯芯：第八章起按关卡配置启用（暗芯起步）
-    this.overlay.setLampEnabled(lv.dualLamp ?? false);
+    // 双灯芯：第八章起按关卡配置启用（暗芯起步；按钮已移除，Q 键切换）
     if (lv.dualLamp) {
-      this.overlay.setLampHandler(() => { this.triggerLampSwitch(); });
-      this.overlay.updateLamp(this.state.getSnapshot());
       // 暗芯起步：光晕收缩
       this.playerLight.setDisplaySize(TILE * 3.2, TILE * 3.2).setAlpha(0.55).setTint(0xd0b080);
       this.updateFog(0);
@@ -145,8 +142,6 @@ export class ExploreScene extends Phaser.Scene {
     });
     this.playerLight.setTint(bright ? 0xfff2d0 : 0xd0b080);
     this.updateFog(280);
-    const snap = this.state.getSnapshot();
-    this.overlay.updateLamp(snap);
     if (ev.text) this.overlay.toast(ev.text, 2400);
   }
 

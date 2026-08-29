@@ -523,6 +523,8 @@ const LEVEL_26: LevelDef = {
   tutorial: true,
   grid: [],
   gridFile: 'L26',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'swamp',
   tint: '#2a4a3a',
 };
@@ -540,6 +542,8 @@ const LEVEL_27: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L27',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'swamp',
   tint: '#2a4a3a',
 };
@@ -557,6 +561,8 @@ const LEVEL_28: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L28',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'swamp',
   tint: '#2a4a3a',
 };
@@ -614,6 +620,8 @@ const LEVEL_31: LevelDef = {
   tutorial: true,
   grid: [],
   gridFile: 'L31',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'cursed',
   tint: '#3a2a5a',
 };
@@ -632,6 +640,8 @@ const LEVEL_32: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L32',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'cursed',
   tint: '#3a2a5a',
 };
@@ -650,6 +660,8 @@ const LEVEL_33: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L33',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'cursed',
   tint: '#3a2a5a',
 };
@@ -699,7 +711,7 @@ const LEVEL_36: LevelDef = {
   id: 36,
   chapterName: '第八章 · 险境',
   levelName: '细节',
-  intro: 'Q 键换芯，这个机制有点笨。总之，是复杂度超标的一章。',
+  intro: '多转几圈，就能绕开。',
   oil: 14,
   treasureOil: 3,
   lowOilThreshold: 4,
@@ -709,6 +721,8 @@ const LEVEL_36: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L36',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'mono',
   tint: '#3a3d42',
 };
@@ -725,6 +739,8 @@ const LEVEL_37: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L37',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'mono',
   tint: '#3a3d42',
 };
@@ -744,6 +760,8 @@ const LEVEL_38: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L38',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'mono',
   tint: '#3a3d42',
 };
@@ -762,6 +780,8 @@ const LEVEL_39: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L39',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'mono',
   tint: '#3a3d42',
 };
@@ -781,6 +801,8 @@ const LEVEL_40: LevelDef = {
   dualLamp: true,
   grid: [],
   gridFile: 'L40',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'mono',
   tint: '#3a3d42',
 };
@@ -798,6 +820,8 @@ const LEVEL_41: LevelDef = {
   tutorial: true,
   grid: [],
   gridFile: 'L41',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'relic',
   tint: '#4a4030',
 };
@@ -814,6 +838,8 @@ const LEVEL_42: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L42',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'relic',
   tint: '#4a4030',
 };
@@ -830,6 +856,8 @@ const LEVEL_43: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L43',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'relic',
   tint: '#4a4030',
 };
@@ -866,6 +894,8 @@ const LEVEL_45: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L45',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'relic',
   tint: '#4a4030',
 };
@@ -883,6 +913,8 @@ const LEVEL_46: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L46',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'abyss',
   tint: '#4a2620',
 };
@@ -922,6 +954,8 @@ const LEVEL_48: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L48',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'abyss',
   tint: '#4a2620',
 };
@@ -940,6 +974,8 @@ const LEVEL_49: LevelDef = {
   lowOilVision: 1,
   grid: [],
   gridFile: 'L49',
+  pulseCost: 2,
+  pulseRadius: 4,
   theme: 'abyss',
   tint: '#4a2620',
 };
