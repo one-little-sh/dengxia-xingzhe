@@ -1,5 +1,15 @@
+oil: 41
+
 #############
-#F.R....R..E#
-#.#.#.#.#.#.#
-#T$T.T.T$T.K#
+#W.........F#
+#.XXXXXXXXXX#
+#.XXXXXXXXXX#
+#$XXXXXXXXXX#
+#.XXXXXXXXXX#
+#C.....W....#
+#XXXXXXXXXX$#
+#XXXXXXXXXX.#
+#XXXXXXXXXXC#
+#XXXXXXXXXX.#
+#EG..C.$....#
 #############
