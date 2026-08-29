@@ -154,19 +154,26 @@
       box-shadow: 0 0 40px rgba(240, 179, 74, 0.06), inset 0 0 60px rgba(0,0,0,.6);
       max-width: 100%;
     }
-    /* 画布原生尺寸由关卡决定，这里用 CSS 等比缩放适配屏幕 */
+    /* 画布原生尺寸由关卡决定，这里用 CSS 等比缩放适配屏幕（宽/高双约束防裁切） */
     canvas {
       display: block;
       image-rendering: pixelated;
-      max-width: min(92vw, 62vh);
+      max-width: min(96vw, 62vh);
+      max-height: calc(100dvh - 230px); /* 桌面：预留 HUD/提示条/按钮行 */
+      width: auto;
       height: auto;
     }
-    /* 触屏方向键：仅粗指针设备显示 */
+    /* 手机端：额外预留方向键与侧按钮，隐藏 hint */
+    @media (pointer: coarse) {
+      canvas { max-height: calc(100dvh - 330px); }
+      #hint { display: none; }
+    }
+    /* 触屏方向键：仅粗指针设备显示（44px 紧凑版） */
     #dpad {
       display: none;
-      grid-template-columns: repeat(3, 56px);
-      grid-template-rows: repeat(3, 56px);
-      gap: 6px;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(3, 44px);
+      gap: 4px;
       user-select: none;
       touch-action: none;
     }
@@ -176,12 +183,29 @@
       border: 1px solid var(--line);
       border-radius: 10px;
       color: var(--ink);
-      font-size: 20px;
+      font-size: 18px;
       touch-action: manipulation;
     }
     #dpad button:active { background: #2a3444; }
     #dpad .blank { visibility: hidden; }
-    #dpad .center { display: flex; align-items: center; justify-content: center; font-size: 18px; opacity: .5; }
+    #dpad .center { display: flex; align-items: center; justify-content: center; font-size: 16px; opacity: .5; }
+    /* 移动控制区：方向键 + 右侧竖排功能按钮（声呐/灯芯） */
+    #mobile-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #dpad-side {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #dpad-side button {
+      min-width: 88px;
+      min-height: 62px;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
     /* 消息提示条：画布下方固定占位，不遮挡地图 */
     #toast {
       min-height: 38px;
@@ -461,8 +485,6 @@
       </div>
       <span id="key-hud" style="display:none">🔑<b id="key-num">0</b></span>
       <span id="coin-hud" style="display:none">🪙<b id="coin-num">0</b><i id="coin-total"></i></span>
-      <button id="pulse-btn" style="display:none">回声（-2 油）</button>
-      <button id="lamp-btn" style="display:none">· 暗芯（1 油/步）</button>
     </div>
     <div id="stage-wrap">
       <div id="panel">
@@ -491,10 +513,16 @@
       <button id="mute-btn" title="音效开关">🔊</button>
       <button id="level-btn" title="选择关卡">选关</button>
     </div>
-    <div id="dpad">
-      <span class="blank"></span><button data-dir="up">▲</button><span class="blank"></span>
-      <button data-dir="left">◀</button><span class="center">🕯️</span><button data-dir="right">▶</button>
-      <span class="blank"></span><button data-dir="down">▼</button><span class="blank"></span>
+    <div id="mobile-controls">
+      <div id="dpad">
+        <span class="blank"></span><button data-dir="up">▲</button><span class="blank"></span>
+        <button data-dir="left">◀</button><span class="center">🕯️</span><button data-dir="right">▶</button>
+        <span class="blank"></span><button data-dir="down">▼</button><span class="blank"></span>
+      </div>
+      <div id="dpad-side">
+        <button id="pulse-btn" style="display:none">回声（-2 油）</button>
+        <button id="lamp-btn" style="display:none">· 暗芯（1 油/步）</button>
+      </div>
     </div>
     <div id="hint">方向键 / WASD 移动 · 按住连续走 · 空格声呐 · Q 换灯芯</div>
   </div>
